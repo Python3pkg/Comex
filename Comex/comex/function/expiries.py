@@ -7,8 +7,8 @@ Expiry utility package for commodity futures and futures options
 __author__ = "Eric Pieuchot"
 __date__ = "9 June 2015"
 
-import comex.util.pyconstant as __DEF__
-import comex.func.pyasset as __COM__
+import comex.static as __DEF__
+import comex.function.assets as __COM__
 import logging as __LOG__
 
 from datetime import date, timedelta
@@ -180,7 +180,7 @@ def get_expiry_date(assetName, contractMonth, expiryType):
         else:
             __LOG__.error("Missing %s", assetName, exc_info=True)
     else:
-        __LOG__.error("Loading %s", __DEF__.PROJECT_ROOT, exc_info=True)
+        __LOG__.error("Loading %s", __DEF__.ROOT_PROJECT, exc_info=True)
     # Output get_expiry_date
     if _expiry != None:
         _expiry = date(_expiry.year, _expiry.month, _expiry.day)

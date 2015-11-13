@@ -7,8 +7,8 @@ Generic US futures and futures options chain
 __author__ = "Eric Pieuchot"
 __date__ = "9 June 2015"
 
-import comex.util.pyconstant as __DEF__
-import comex.func.pyasset as __COM__
+import comex.static as __DEF__
+import comex.function.assets as __COM__
 import logging as __LOG__
 
 from datetime import date
@@ -45,7 +45,7 @@ class OptType(Enum):
 # Futures code utility functions
 #-------------------------------------------------------------------------------
 
-def get_futures_code(contractMonth):
+def get_futures_code(contractMonth,modYear=True):
     """get future" code from contract month"""
     _futcode = None
     # Sample months dictionary
@@ -54,7 +54,10 @@ def get_futures_code(contractMonth):
     _mod = date.today().year - (date.today().year % 10)
     # Check input type
     if isinstance(contractMonth, date):
-        _year = str(contractMonth.year - _mod)
+        if modYear:
+            _year = str(contractMonth.year - _mod)
+        else:
+            _year = str(contractMonth.year)
         _month = _dicmonths[contractMonth.month]
         _futcode = _month.upper() + _year
     # Output get_future_code
@@ -81,6 +84,31 @@ def get_contract_month(futuresCode):
 #-------------------------------------------------------------------------------
 # Ticker utility functions
 #-------------------------------------------------------------------------------
+
+def get_qdl_ticker(assetName, contractMonth, optionStrike=0, optionType=""):
+    """Get Quandl ticker for futures"""
+    _qdlticker = None
+    # Retrieve static data from xml serialization
+    _assets = __COM__.Assets()
+    if _assets.xml_to_py():
+        if _assets.has_key(assetName):
+            _asset = _assets[assetName]
+            _ticker = _asset.ticker
+            if isinstance(_asset, __COM__.Commodity):
+                _family = _asset.family
+            elif isinstance(_asset, __COM__.Index):
+                _family = __DEF__.ComType.Unknown
+        else:
+            __LOG__.error("Missing asset %s", assetName, exc_info=True)
+    else:
+        __LOG__.error("Error loading %s", __DEF__.ROOT_PROJECT, exc_info=True)
+    del _assets, _asset
+    # Output get_qdl_ticker
+    _futcode = get_futures_code(contractMonth,False)
+    _qdlticker = _ticker + _futcode
+    if _qdlticker != None:
+        _qdlticker = _qdlticker.upper()
+    return _qdlticker
 
 def get_bbg_ticker(assetName, contractMonth, optionStrike=0, optionType="",
                    bbgKey=False):
@@ -113,7 +141,7 @@ def get_bbg_ticker(assetName, contractMonth, optionStrike=0, optionType="",
         else:
             __LOG__.error("Missing asset %s", assetName, exc_info=True)
     else:
-        __LOG__.error("Error loading %s", __DEF__.PROJECT_ROOT, exc_info=True)
+        __LOG__.error("Error loading %s", __DEF__.ROOT_PROJECT, exc_info=True)
     del _assets, _asset
     # Select ticker syntax if futures or options
     if _isfutures or _isoption:

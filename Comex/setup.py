@@ -7,7 +7,7 @@ Python distribution
 from setuptools import setup, find_packages
 
 setup(name="Comex",
-      version="1.2",
+      version="1.3",
       description="Commodity exotics",
       long_description = "Market data analysis tool kit",
       platforms=["Windows","Mac"],
@@ -15,6 +15,6 @@ setup(name="Comex",
       author_email="pieeri_abn@yahoo.co.uk",
       url="https://pypi.python.org/pypi/Comex/",
       license="MIT",
-      install_requires=["enum34","pandas"],
+      install_requires=["enum34","pandas","numpy","blpapi","Quandl"],
       packages=find_packages(),
       package_data={'comex':['data/*.ini','data/*.xml','data/*.txt']})

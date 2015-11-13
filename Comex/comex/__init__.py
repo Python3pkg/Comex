@@ -3,6 +3,12 @@
 """Comex package"""
 
 __author__ = "Eric Pieuchot"
-__date__ = "8 Jul 2015"
+__date__ = "4 Nov 2015"
 
-__all__ = ['run','static']
+# Function package interface
+from comex.function.tickers import get_qdl_ticker, get_bbg_ticker
+from comex.function.expiries import get_expiry_date
+
+# Start trapping errors
+import comex.utility.error as __ERR__
+__ERR__.start_logging()

@@ -41,18 +41,18 @@ class Asset(object):
             _cal = self.calendar.lower()
             if _config.has_key(_cal):
                 try:
-                    _file = os.path.join(__DEF__.PROJECT_ROOT, _config[_cal])
+                    _file = os.path.join(__DEF__.ROOT_DATA, _config[_cal])
                     with open(_file, 'r') as _txt:
                         _week_mask = "Mon Tue Wed Thu Fri"
                         _hol_mask = [_lgn.pop() for _lgn in csv.reader(_txt)]
                         _hol_center = CustomBusinessDay(holidays=_hol_mask,
                                                         weekmask=_week_mask)
                 except IOError:
-                    logging.critical("Failing %s", _config[_cal], exc_info=True)
+                    __LOG__.critical("Failing %s", _config[_cal], exc_info=True)
             else:
-                logging.warning("Missing %s", _cal, exc_info=True)
+                __LOG__.warning("Missing %s", _cal, exc_info=True)
         else:
-            logging.error("Reading %s", __DEF__.CONFIG_SECTION_CALENDAR, exc_info=True)
+            __LOG__.error("Reading %s", __DEF__.CONFIG_SECTION_CALENDAR, exc_info=True)
         # Output get_custom_date
         return _hol_center
 
@@ -85,9 +85,9 @@ class Assets(dict):
         _config = __CFG__.Config()
         if _config.add_section(__DEF__.CONFIG_SECTION_SETTING):
             _name = _config["asset_file"]
-            self._file = os.path.join(__DEF__.PROJECT_ROOT, _name)
+            self._file = os.path.join(__DEF__.ROOT_DATA, _name)
         else:
-            logging.error("Error on adding %s", __DEF__.CONFIG_SECTION_SETTING,
+            __LOG__.error("Error on adding %s", __DEF__.CONFIG_SECTION_SETTING,
                           exc_info=True)
     
     def py_to_xml(self):
@@ -137,7 +137,7 @@ class Assets(dict):
                                    newl='\n')
                 _serialized = True
             except:
-                logging.critical("Error on saving %s", self._file,
+                __LOG__.critical("Error on saving %s", self._file,
                                          exc_info=True)
                 _serialized = False
         return _serialized                    
@@ -179,7 +179,7 @@ class Assets(dict):
                 _deserialized = True
         except:
             # Trap corrupted file or pathname
-            logging.critical("Error on file %s", self._file, exc_info=True)
+            __LOG__.critical("Error on file %s", self._file, exc_info=True)
             _deserialized = False
         return _deserialized
 
