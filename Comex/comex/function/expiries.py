@@ -41,6 +41,121 @@ class ExpType(Enum):
         return _exptype
 
 #-------------------------------------------------------------------------------
+# Expiry utility functions
+#-------------------------------------------------------------------------------
+
+def get_front_month(assetName, baseDate, expiryType, lag=0):
+    """
+    Description
+    -----------
+    Get front month contract for commodity futures
+        
+    Parameters
+    ----------
+        assetName (string): Comex asset name
+        
+        baseDate (date): date object
+        
+        expiryType (string): futures 'F', notice 'N', options 'OF'
+        
+        lag (integer): lag roll for expiryType
+        
+    Examples
+    --------
+        functionReturn (date)::
+            
+            >>> comex.get_font_month()
+            date()
+    """
+    _front = None
+    # Retrieve static from XML serialization
+    _assets = __COM__.Assets()
+    if _assets.xml_to_py():
+        if _assets.has_key(assetName):
+            _asset = _assets[assetName]
+            if isinstance(_asset, __COM__.Commodity):
+                if isinstance(baseDate, date):
+                    _cal = _asset.get_custom_date()
+                    baseDate += lag * _cal
+                    _roll = date(baseDate.year, baseDate.month, baseDate.day)
+                    _front = date(baseDate.year, baseDate.month, 1)
+                    while(True):
+                        _expiry = get_expiry_date(_asset.name, _front, expiryType)
+                        if _expiry < _roll:
+                            if _front.month == 12:
+                                _front = date(_front.year + 1, 1, 1)
+                            else:
+                                _front = date(_front.year, _front.month + 1, 1)
+                        else:
+                            break
+                else:
+                    __LOG__.error("Type %s", type(baseDate), exc_info=True)
+            else:
+                __LOG__.error("Instance %s", type(_asset), exc_info=True)
+        else:
+            __LOG__.error("Missing %s", assetName, exc_info=True)
+    else:
+        __LOG__.error("Loading %s", __DEF__.ROOT_PROJECT, exc_info=True)
+    # Output get_expiry_date
+    return _front
+
+def get_expiry_date(assetName, contractMonth, expiryType):
+    """
+    Description
+    -----------
+    Get first notice and expiration dates for commodity futures and options
+        
+    Parameters
+    ----------
+        assetName (string): Comex asset name
+        
+        contractMonth (date): date object
+        
+        expiryType (string): futures 'F', notice 'N', options 'OF'
+        
+    Examples
+    --------
+        functionReturn (date)::
+            
+            >>> comex.get_expiry_date("WTI_NYMEX", date(2015, 12, 1), "F")
+            date(2015, 11, 20)
+    """
+    _expiry = None
+    # Retrieve static from XML serialization
+    _assets = __COM__.Assets()
+    if _assets.xml_to_py():
+        if _assets.has_key(assetName):
+            _asset = _assets[assetName]
+            if isinstance(_asset, __COM__.Commodity):
+                if isinstance(contractMonth, date):
+                    _type = ExpType.get(expiryType)
+                    _cal = _asset.get_custom_date()
+                    if assetName == "WTI_NYMEX":
+                        _expiry = __wti_nymex_exp__(_cal, contractMonth, _type)
+                    elif assetName == "WTI_ICE":
+                        _expiry = __wti_ice_exp__(_cal, contractMonth, _type)
+                    elif "BR" in assetName:
+                        _expiry = __br_ice_exp__(_cal, contractMonth, _type)
+                    elif assetName == "HO_NYMEX" or assetName == "RB_NYMEX":
+                        _expiry = __ho_nymex_exp__(_cal, contractMonth, _type)
+                    elif assetName == "NG_NYMEX":
+                        _expiry = __ng_nymex_exp__(_cal, contractMonth, _type)
+                    elif assetName == "GO_ICE":
+                        _expiry = __go_ice_exp__(_cal, contractMonth, _type)
+                else:
+                    __LOG__.error("Type %s", type(contractMonth), exc_info=True)
+            else:
+                __LOG__.error("Instance %s", type(_asset), exc_info=True)
+        else:
+            __LOG__.error("Missing %s", assetName, exc_info=True)
+    else:
+        __LOG__.error("Loading %s", __DEF__.ROOT_PROJECT, exc_info=True)
+    # Output get_expiry_date
+    if _expiry != None:
+        _expiry = date(_expiry.year, _expiry.month, _expiry.day)
+    return _expiry
+
+#-------------------------------------------------------------------------------
 # Energy futures expiries
 #-------------------------------------------------------------------------------
 
@@ -141,52 +256,6 @@ def __go_ice_exp__(assetCalendar, contractMonth, expiryType):
     return _expiry
 
 #-------------------------------------------------------------------------------
-# Expiry utility functions
-#-------------------------------------------------------------------------------
-
-def get_font_month(assetName, refDate):
-    """get front month contract for commodity futures"""
-    _front = None
-    return _front
-
-def get_expiry_date(assetName, contractMonth, expiryType):
-    """Get first notice and expiry dates for commodity futures and options"""
-    _expiry = None
-    # Retrieve static from XML serialization
-    _assets = __COM__.Assets()
-    if _assets.xml_to_py():
-        if _assets.has_key(assetName):
-            _asset = _assets[assetName]
-            if isinstance(_asset, __COM__.Commodity):
-                if isinstance(contractMonth, date):
-                    _type = ExpType.get(expiryType)
-                    _cal = _asset.get_custom_date()
-                    if assetName == "WTI_NYMEX":
-                        _expiry = __wti_nymex_exp__(_cal, contractMonth, _type)
-                    elif assetName == "WTI_ICE":
-                        _expiry = __wti_ice_exp__(_cal, contractMonth, _type)
-                    elif "BR" in assetName:
-                        _expiry = __br_ice_exp__(_cal, contractMonth, _type)
-                    elif assetName == "HO_NYMEX" or assetName == "RB_NYMEX":
-                        _expiry = __ho_nymex_exp__(_cal, contractMonth, _type)
-                    elif assetName == "NG_NYMEX":
-                        _expiry = __ng_nymex_exp__(_cal, contractMonth, _type)
-                    elif assetName == "GO_ICE":
-                        _expiry = __go_ice_exp__(_cal, contractMonth, _type)
-                else:
-                    __LOG__.error("Type %s", type(contractMonth), exc_info=True)
-            else:
-                __LOG__.error("Instance %s", type(_asset), exc_info=True)
-        else:
-            __LOG__.error("Missing %s", assetName, exc_info=True)
-    else:
-        __LOG__.error("Loading %s", __DEF__.ROOT_PROJECT, exc_info=True)
-    # Output get_expiry_date
-    if _expiry != None:
-        _expiry = date(_expiry.year, _expiry.month, _expiry.day)
-    return _expiry
-
-#-------------------------------------------------------------------------------
 # Unit testing
 #-------------------------------------------------------------------------------
 
@@ -198,4 +267,8 @@ if __name__ == "__main__":
     print(_exp)
     _type ="of"
     _exp = get_expiry_date(_asset, _contract, _type)
+    print(_exp)
+    _type ="n"
+    _base = date.today()
+    _exp = get_front_month(_asset, _base, _type)
     print(_exp)

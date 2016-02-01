@@ -125,7 +125,7 @@ class Connection(object):
                             _value = _fielddata.getElement(j).getValueAsFloat()
                             _response[(_ticker, bbgFields[j-1])][_date] = _value
                 if _event.eventType() == blpapi.Event.RESPONSE:
-                    # Response completly received, so we could exit
+                    # Response completely received, so we could exit
                     logging.info("Request fully received", exc_info=True)
                     break
             except:
