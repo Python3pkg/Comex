@@ -8,7 +8,7 @@ __author__ = "Eric Pieuchot"
 __date__ = "8 Jul 2015"
 
 from logging import critical, error, warning
-from ConfigParser import ConfigParser
+from configparser import ConfigParser
 import comex.static as __DEF__
 
 __all__ = ['Config']
@@ -45,7 +45,7 @@ class Config(dict):
             _options = self._parser.options(section)
             for _option in _options:
                 # Remove duplicate
-                if self.has_key(_option): del self[_option]
+                if _option in self: del self[_option]
                 try:
                     # Add 'settings:' from [section]
                     _dict[_option] = self._parser.get(section, _option)
@@ -69,4 +69,4 @@ if __name__ == "__main__":
     _test = Config()
     _test.add_section()
     _test.add_section(__DEF__.CONFIG_SECTION_CALENDAR)
-    print(_test.keys())
+    print((list(_test.keys())))

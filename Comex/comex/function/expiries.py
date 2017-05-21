@@ -35,7 +35,7 @@ class ExpType(Enum):
         # Key retrieval
         if type(expiryType) == str:
             _type = expiryType.lower()
-            if _dictypes.has_key(_type):
+            if _type in _dictypes:
                 _exptype = _dictypes[_type]
         # Output ExpType.get
         return _exptype
@@ -71,7 +71,7 @@ def get_front_month(assetName, baseDate, expiryType, lag=0):
     # Retrieve static from XML serialization
     _assets = __COM__.Assets()
     if _assets.xml_to_py():
-        if _assets.has_key(assetName):
+        if assetName in _assets:
             _asset = _assets[assetName]
             if isinstance(_asset, __COM__.Commodity):
                 if isinstance(baseDate, date):
@@ -124,7 +124,7 @@ def get_expiry_date(assetName, contractMonth, expiryType):
     # Retrieve static from XML serialization
     _assets = __COM__.Assets()
     if _assets.xml_to_py():
-        if _assets.has_key(assetName):
+        if assetName in _assets:
             _asset = _assets[assetName]
             if isinstance(_asset, __COM__.Commodity):
                 if isinstance(contractMonth, date):

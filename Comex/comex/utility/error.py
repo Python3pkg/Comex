@@ -46,7 +46,7 @@ def start_logging(fileName=__DEF__.LOGGING_FILE):
 
 if __name__ == "__main__":
     # Unit testing
-    print(start_logging())
+    print((start_logging()))
     __LOG__.debug("Debug message")
     __LOG__.info("Info message")
     __LOG__.warning("Warning message")

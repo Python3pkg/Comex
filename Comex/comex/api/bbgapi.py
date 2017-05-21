@@ -188,7 +188,7 @@ class Connection(object):
                         if _size > 0:                        
                             for j in range(len(_fields)):
                                 _value = _tickdata.getElementAsFloat(_fields[j])
-                                if _response[(_fields[j])].has_key(_time):
+                                if _time in _response[(_fields[j])]:
                                     if _fields[j] == "value":
                                         _response[(_fields[j])][_time] += _size*_value
                                     else:
@@ -202,7 +202,7 @@ class Connection(object):
                     # Response completly received, so we could exit
                     logging.info("Request fully received", exc_info=True)
                     # Retrieve average "value" per time stamp
-                    for _time in _response[("value")].keys():
+                    for _time in list(_response[("value")].keys()):
                         _size = _response[("size")][_time]
                         if _size > 1: _response[("value")][_time] /= _size
                     break
@@ -281,7 +281,7 @@ if __name__ == "__main__":
     #Testing unit for Bloomberg Python 2.7 API
     import pandas as PD
     _connection = Connection()
-    print(_connection.start_service())
+    print((_connection.start_service()))
     _data = _connection.bdh()
     _table = PD.DataFrame(_data)
     _table.plot()

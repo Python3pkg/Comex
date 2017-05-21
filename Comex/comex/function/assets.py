@@ -39,7 +39,7 @@ class Asset(object):
         _config = __CFG__.Config()
         if _config.add_section(__DEF__.CONFIG_SECTION_CALENDAR):
             _cal = self.calendar.lower()
-            if _config.has_key(_cal):
+            if _cal in _config:
                 try:
                     _file = os.path.join(__DEF__.ROOT_DATA, _config[_cal])
                     with open(_file, 'r') as _txt:
@@ -99,7 +99,7 @@ class Assets(dict):
             _root = __ET__.Element("assets")
             _root.set("exported", datetime.today().strftime("%d-%m-%Y %H:%M:%S"))
             # Browse through pyasset items
-            for _asset in self.values():
+            for _asset in list(self.values()):
                 # Check element as class instance
                 if isinstance(_asset, Asset):
                     _element = __ET__.SubElement(_root, "asset")
@@ -123,7 +123,7 @@ class Assets(dict):
                         _element.set("type", "index")
                         __ET__.SubElement(_element,"divisor").text = str(_asset.divisor)
                         _parent = __ET__.SubElement(_element,"basket")
-                        for _item in _asset.basket.items():
+                        for _item in list(_asset.basket.items()):
                             _child = __ET__.SubElement(_parent,"constituent")
                             _child.set("contract", str(_item[0]))
                             _child.set("weight", str(_item[1]))
@@ -206,9 +206,9 @@ if __name__ == "__main__":
     _assets[_commodity.name] = _commodity
     _assets[_index.name] = _index
     # Test pyclass serialization / deserialization
-    print(_assets.keys())
-    print(_assets.py_to_xml())
+    print((list(_assets.keys())))
+    print((_assets.py_to_xml()))
     del _commodity, _index, _assets
     _assets = Assets()
-    print(_assets.xml_to_py())
-    print(_assets.keys())
+    print((_assets.xml_to_py()))
+    print((list(_assets.keys())))

@@ -36,7 +36,7 @@ class OptType(Enum):
         # Key retrieval
         if type(optionType) == str:
             _type = optionType.lower()
-            if _dictypes.has_key(_type):
+            if _type in _dictypes:
                 _opttype = _dictypes[_type]
         # Output OptType.get
         return _opttype
@@ -74,7 +74,7 @@ def get_contract_month(futuresCode):
     _index = len(futuresCode)
     if (type(futuresCode) == str) and (_index > 1) and (_index < 4):
         _month = futuresCode[0].lower()
-        if _diccodes.has_key(_month):
+        if _month in _diccodes:
             _month = _diccodes[_month]
             _year = int(futuresCode[1:_index]) + _mod
             _contractmonth = date(_year, _month, 1)
@@ -91,7 +91,7 @@ def get_qdl_ticker(assetName, contractMonth, optionStrike=0, optionType=""):
     # Retrieve static data from xml serialization
     _assets = __COM__.Assets()
     if _assets.xml_to_py():
-        if _assets.has_key(assetName):
+        if assetName in _assets:
             _asset = _assets[assetName]
             _ticker = _asset.ticker
             if isinstance(_asset, __COM__.Commodity):
@@ -127,7 +127,7 @@ def get_bbg_ticker(assetName, contractMonth, optionStrike=0, optionType="",
     # Retrieve static data from xml serialization
     _assets = __COM__.Assets()
     if _assets.xml_to_py():
-        if _assets.has_key(assetName):
+        if assetName in _assets:
             _asset = _assets[assetName]
             _ticker = _asset.ticker
             if isinstance(_asset, __COM__.Commodity):
@@ -180,7 +180,7 @@ if __name__ == "__main__":
     _code = get_futures_code(_contract)
     print(_code)
     _contract = get_contract_month(_code)
-    print(_contract.isoformat())
+    print((_contract.isoformat()))
     _asset = "WTI_NYMEX"
     _ticker = get_bbg_ticker(_asset, _contract)
     print(_ticker)

@@ -31,7 +31,7 @@ class CloseAnalysis(object):
                                             bbgTicker = bbgTicker,
                                             startTime = _start.isoformat(),
                                             endTime = settleTime.isoformat())
-                    for _time in _data[("value")].keys():
+                    for _time in list(_data[("value")].keys()):
                         _value = _data[("value")][_time]
                         _data[("value")][_time] = _value - math.fmod(_value, bbgTick)
                     if _connection.stop_service():
@@ -45,10 +45,10 @@ class CloseAnalysis(object):
             _prod = _size * _value
             self.vwap = _prod.sum() / _size.sum()
             self.twap = _value.sum() / _value.size
-            print("vwap: %s" %self.vwap)
-            print("twap: %s" %self.twap)
-            print("volume: %s" %_size.sum())
-            print(self.table)
+            print(("vwap: %s" %self.vwap))
+            print(("twap: %s" %self.twap))
+            print(("volume: %s" %_size.sum()))
+            print((self.table))
             self.table.value.plot(legend=True)
             self.table.size.plot(secondary_y=True)
             if runningStat:
